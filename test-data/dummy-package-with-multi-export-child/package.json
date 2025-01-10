@@ -1,0 +1,9 @@
+{   
+    "name":"dummy-package",
+    "js-hell": {
+        "child": "*" 
+    },
+    "dependencies": {
+        "child": "0.0"
+    } 
+} 

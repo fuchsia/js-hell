@@ -1,0 +1,39 @@
+{
+  "name": "js-hell",
+  "version": "1.0.20250110",
+  "description": "A tool for running javascript from the command-line (CLI). Instead of using a library to parse options, annotate your script or package and js-hell will runs it for you.",
+  "keywords": "cli shell",
+  "-- It's not importable, so skip main": "",
+  "-- main": "lib/host/main.mjs",
+  "directories": {
+    "lib": "lib"
+  },
+  "devBin": {
+    "js-hell-dev": "lib/bin/cli.mjs"
+  },
+  "bin": "dist/js-hell.mjs",
+  "-- files: we don't need anything other than bin, plus README, LICENCE, and package.json; all of which are auto included.": "",
+  "files": [],
+  "scripts": {
+    "test-debug": "node --no-warnings -- node_modules/jasmine/bin/jasmine.js --reporter=./test-data/specReporter.mjs",
+    "test": "npx jasmine",
+    "mimetype-extensions-make": "js-hell lib/utils/mimetype-extensions-make.mjs node_modules/mime-db/db.json --output=lib/utils/mimetype-extensions.json",
+    "make-dist": "rollup -c rollup.config.mjs"
+  },
+  "js_hell": {
+    "jasmine": "API=1 jasmine :: default()"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "mime-db": "^1.52.0",
+    "terser": "^5.34.1"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^10.0.0"
+  },
+  "dependencies": {
+    "jasmine": "^5.5.0"
+  }
+}

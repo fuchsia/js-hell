@@ -1,0 +1,6 @@
+{   
+    "name":"dummy-package",
+    "main": "main.mjs",
+    "js_hell": "IDL=1 dummy -- Does nowt!\n :: ()",
+    "version": "10.0.0"
+} 

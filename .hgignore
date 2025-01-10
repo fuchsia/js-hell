@@ -1,0 +1,9 @@
+syntax:glob
+*.bak
+*.BAK
+*.txt
+*.orig
+*.rej
+node_modules\*
+.git\*
+

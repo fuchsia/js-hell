@@ -1,0 +1,7 @@
+[
+    { "user": 1, "quiz": 1, "score": 10 },
+    { "user": 1, "quiz": 2,  "score": 10 },
+    { "user": 2, "quiz": 1, "score": 11 },
+    { "user": 2, "quiz": 2,  "score": 15 },
+    { "user": 3, "quiz": 1, "score": 8 }
+]

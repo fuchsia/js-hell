@@ -1,0 +1,8 @@
+{   
+    "name":"dummy-package",
+    "main": "main.mjs",
+    "js_hell": "IDL=1 dummy -- Does nowt!\n :: ()",
+    "dependencies": {
+        "child": "0.0"
+    } 
+} 

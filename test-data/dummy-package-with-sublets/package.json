@@ -1,0 +1,10 @@
+{   
+    "name":"dummy-package",
+    "js-hell": {
+        "#cmd": {
+            "#valid":          "IDL=1 $0 :: with() 'yes'",
+            "./list.mjs":      "IDL=1 list :: default()",
+            "./edit.mjs#rm":   "IDL=1 rm TEXT :: rm($1)"
+        } 
+    } 
+}  

@@ -1,0 +1,5 @@
+{    
+    "name": "wibble",    
+    "main": "./misnamed.mjs",    
+    "js-hell": "IDL=1 wobble :: default()"
+}

@@ -1,0 +1,7 @@
+{
+    "name": "katylog",
+    "js-hell": { 
+        "#one": "IDL=1 one :: with() 'one'", 
+        "#two": "IDL=1 two :: with() 'two'" 
+    }
+} 

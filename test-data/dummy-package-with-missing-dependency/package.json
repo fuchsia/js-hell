@@ -1,0 +1,6 @@
+{
+    "name": "dummy-package",
+    "dependencies": {
+        "child": "0.0"
+    }
+}
