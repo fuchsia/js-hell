@@ -51,8 +51,8 @@ hyphen here.)
       "my-script                -- Process PNG_FILEs to produce our data.", 
       "    [--iterations=COUNT] -- Number of times to process data.",
       "    PNG_FILE... ",
-      ":: crunchData( $1.map( file => file.toBuffer()) ,{iterations=1})",
-  }
+      ":: crunchData( $1.map( file => file.toBuffer()) ,{iterations=1})"
+  ]
 }
 ```
 #### main.mjs: 
@@ -106,10 +106,9 @@ It's js-hell's job to manage compatibility issues. (The `IDL=` tag that
 all IDL declarations begin with solve the internal compatibility. You
 can similary invoke scripts with `CLI=` tag.)
 
-js-hell installs two "binaries": `js-hell.mjs` which is a rolled up
-minfiied version of js-hell installed in `dist/js-hell.mjs` and
-`js-hell-dev` which calls the unrolled up version. `dist/js-hell.mjs`
-can be moved about anywhere and used, as is.
+js-hell install a single binary: `js-hell.mjs` which is a rolled up
+an minified (`dist/js-hell.mjs`) which can be moved about anywhere and 
+used, as is.
 
 ### Optional Dependencies
 js-hell has an _optional_ dependency on better-sqlite3. The intent is to
@@ -117,7 +116,6 @@ retire this for node's internal implementation when it becomes stable.
 (But some of my tools depends on better-sqlite's features.) It's only
 required if you call the `database()` method on `File` and otherwise
 won't be used.  
-
 
 Project axiom
 ------
@@ -159,18 +157,18 @@ Throughout this documents, arguments are written as
 js-hell '"cmd --argument *.html *.css"'
 ```
 
-This utilises [reduplicated quoting]() and [single first argument
-reparsing]() to run on Windows and Unix without interference from their
-respective shells. 
+This utilises [doubled quoting](#doubled-quoting) and [single first argument
+reparsing](#single-first-argument-reparsing) to run on Windows and Unix without 
+interference from their respective shells. 
 
 Obviously, it's up to you what you write in the privacy of your own
-terminal. But remember on POSIX shells (i.e. bash, zsh etc...) that you
+terminal. But remember on POSIX shells (i.e. bash, zsh etc...) you
 will have to protect the arguments from evaluation; e.g. 
-```bash
+```sh
 js-hell dir * 
 ```
 will call `dir` with all the files whereas 
-```bash
+```sh
 js-hell dir '*'
 ```
 will let dir lookup the files (and start listing them as soon as one is
@@ -178,25 +176,26 @@ found, instead of waiting for the whole directory to be read).
 
 And similarly, POSIX shells will want to interpret many of the features
 js-hell provides; e.g.
-```bash
+```sh
 js-hell scriptlet --option=${value}
 ``` 
 is very different to
-```bash
-js-hell scriptlet '--option=${value}'
+```sh
+js-hell scriptlet '"--option=${value}"'
 ```
 
 ### Tokenisation
 
 #### Doubled quoting
 Single and double quotes are trimmed from any argument js-hell is
-passed. For example, typing `js-hell echo "'some'"` or `echo '"some"'`
+passed (i.e. any argument in argv). For example, typing `js-hell echo "'some'"`
+or `echo '"some"'`
 results in js-hell outputing `some` (without any quotes).
 
 The exact rule is that quotes are removed when one of the quote
 characters (`"`or `'`) opens an argument, and the same quote character
 closes it and occurs nowhere else in the argument. {[REDUP-*]
-first-pass} 
+first-pass}
 
 This allows safe cross-platform quoting; e.g.
 ```json
@@ -212,17 +211,17 @@ its argument. Whereas, unix shells will respect the outermost single
 quotes and pass js-hell `"xwh ${env.PORT}"` as its argument. In either
 case, the extra set of quotes is trimmed.)
 
-The same rule applies to the argument of options (i.e. the bit after an
+The same rule applies to the arguments of options (i.e. the bit after an
 equals sign) For example, `echo-value --value='"some thing"' prints
 `some thing` (and not `"some thing"`) to the console.
 
-This is a feature of thr argv parser. 
+This is a feature of thr argv parser.
 
 #### Single first argument reparsing
 If js-hell has a single positional argument then it reparses it using
 it's own tokensier; e.g. 
 ```bash
-js-hell 'scriptlet --option=${value} *.html'
+js-hell '"scriptlet --option=${value} *.html"'
 ```
 is the same as
 ```bash
@@ -230,27 +229,16 @@ js-hell scriptlet --option='${value}' '*.html'
 ```
 
 This flexibility, however, can be a gotcha if you are trying to invoke a
-scriptlet with a space in the filename. There is currently no work
-around. <!--and no other arguments
-- in that case double quote the name. For example to invoke `"some
-dir/cmd.mjs"` you need to do: 
-```bash
-js-hell '"some dir/cmd.mjs"'
-```
-This extra layer of quoting is not needed if other arguments are
-present; for example:
-```bash
-js-hell "some dir/cmd.mjs" --option 
-```
-tries to run `"some dir/cmd.mjs"`-->
+scriptlet with a space in the filename _and no other arguments_.  
+currently no work around. 
 
 
-#### Tokeniser of argv
-When js-hell is run from another shell (bash, zsh, cmd.exe, etc...), the
+#### Tokenisation of argv
+When js-hell is run from another shell (bash, zsh, cmd.exe, etc...), that
 shell breaks the command-line into a series of arguments. These are
 passed to js-hell in an array known as `argv`. Unhelpfully, all the
 quotes have been removed which leaves js-hell in the dark about what was
-quoted. So js-hell applies the following rules:
+quoted. So js-hell applies the following logic:
 
  1. Elements of argv that contain exactly two ocurrences of the single-
     (`'`) or double- (`"`) quote---one at the beginning and one at the
@@ -262,7 +250,7 @@ quoted. So js-hell applies the following rules:
     reduplicating quotes, e.g. `js-hell echo '"--output=file"'`
 
  2. Elements of argv that begin with `${` are expected to be
-    expressions. They'll be passed using the binding logic. And they are
+    expressions. They'll be passed using the parser for bindings. And they are
     expected to finish with the closing `}` as the last character of the
     argument. Anything else should be an error. (Tests?)
  
@@ -276,9 +264,9 @@ quoted. So js-hell applies the following rules:
     `&&`, etc...) are treated as an operator. (You need reduplicated
     quoting to prevent this; e.g. `js-hell echo some '"&&"' echo thing`
     prints `some && echo thing` to the console; whereas `js-hell echo
-    some && echo thing` prints two lines `some` and `thing`) 
+    some "&&" echo thing` prints two lines `some` and `thing`) 
   
- 5. The first element of argv that is an double-dash (`--`) is deleted.
+ 5. The first element of argv that is a double-dash (`--`) is deleted.
     All remaining elements of argv that beging with a dash will be
     treated as positionals. For example, in `js-hell cmd --x -- --y`
     `--x` is an option, but `--y` isn't. (Tests?) And `js-hell echo --
@@ -291,7 +279,7 @@ quoted. So js-hell applies the following rules:
     `js-hell echo -- -Cdir`.)
 
  6. Elements of argv that are a single dash (`-`) are the file topic.
-    This wil be stdin, if a FILE, or just a position '-' if the argument
+    This wil be stdin, if a FILE, or a literal '-' if the argument
     is not "file-like". The section on the FILE TOPIC gives the ins and
     outs. <!-- Q: How many of those rules are tokeniser rules and so
     should be here? -->
@@ -308,8 +296,7 @@ quoted. So js-hell applies the following rules:
     option's value.
 
     (The equals sign is entirely optional. An option expecting a value
-    will consume the next positional, if it doesn't have one. But it
-    makes for more obvious parsing.)       
+    will consume the next positional. But it makes for more obvious parsing.)
 
 #### Tokenisation of strings
 When breaking a string into "arguments", js-hell uses the follow rules:
@@ -318,41 +305,33 @@ When breaking a string into "arguments", js-hell uses the follow rules:
 them in sync? Or move it here?--> <!-- Split this into topics -->
 
  1. Arguments are separated by "spaces" (any codepoint matching `/\s/`)
-    and by the specials `!?$%^=@#~()[]{}<>&|,;`'"`. (So `some>file` is
+    and by the specials ``!?$%^=@#~()[]{}<>&|,;`'"``. (So `some>file` is
     two argments separator by the `>` operator.)  
  2. Spaces and specials must be quoted for their literal value to appear
     in an argument. {[ARGTOK-SPECIAL-*]} Due to code reuse, the
     double-colon `::` cannot appear unquoted. (A bug to be fixed...)
-
-
- 3. Simple Quoting: 
-
-    a. Quoting happens with single (`'`) or double (`"`)
-    quotes. 
-
-    b. Quoting runs through to the next occurence of the
-    character. 
-
-    c. Quoting must cover the entire argument. (So there is
-    no quoting spaces in the middle of the string like `some" "thing"`.)
-    The exception is the argument to an option counts 
-    so `--some="thing"` fine, as is `--empty=""`
-
-    d. There are **no escapes** with backslashes or anything else.
+ 3. Simple Quoting:
+     <!-- Annoying we can't nest with letters; it displays as roman numerals. -->
+    1. Quoting happens with single (`'`) or double (`"`)
+       quotes.
+    2. Quoting runs through to the next occurence of the
+       character.
+    3. Quoting must cover the entire argument. (So there is
+       no quoting spaces in the middle of the string like `some" "thing"`.)
+       The exception is the argument to an option counts 
+       so `--some="thing"` fine, as is `--empty=""`
+    4. There are **no escapes** with backslashes or anything else.
        (This is for compatibility with Windows where, for example,
        `"\\server\share\some dir\"` makes it about impossible to escape
-       anything with a backslash.) {[ARGTOK-BACKSLASH-*]}     
-
-    f. Quotes must be proceed by or followed by a space or an operator;
+       anything with a backslash.) {[ARGTOK-BACKSLASH-*]}
+    5. Quotes must be proceed by or followed by a space or an operator;
        it is an error for them to happen mid argument. (So `cmd x" "y`
        is an error.)
-
- 4. Backticks also quote. (e.g ``cmd `hello world` ``) 
+ 5. Backticks also quote. (e.g ``cmd `hello world` ``) 
 
     These are **not** command subsitution, as is normal for a shell, but
     are strings evaluated according to the rules for javascript's
-    [template
-    literals.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
+    [template literals.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
     That means:
 
     - Templates supports backslash escapes (so 
@@ -374,7 +353,7 @@ them in sync? Or move it here?--> <!-- Split this into topics -->
       point it will support CLI subshells, e.g. 
      ``js-hell echo1 `some$(cmd)thing`" ``
 
- 5. `${}` can be used to say the argument should be the result of an
+ 6. `${}` can be used to say the argument should be the result of an
     expression; e.g. `js-hell '"cat ${prompt()}"'` It cannot be quoted
     and must take up the whole argument, i.e. a space must follow the
     closing `}` Strings will probably be instantiated, but non-strings
@@ -399,7 +378,7 @@ This tells js-hell which version you are using and it might even adapt.
 #### `**` wildcard available.
 The `**` wildcard is available to recursie into subdirectories; for example
 ```bash
-     js-hell dir **/*.txt 
+     js-hell '"dir **/*.txt"'
 ```
 lists all `.txt` files in the current directory tree - subject to
 exclusions (see below).
@@ -413,7 +392,7 @@ over to node's globs and equivalent functions.
 #### Recursive handling of directories.
 If a scriptlet wants a glob, and a directory is given, then `**` will be
 appended to it. (For example, `js-hell dir some_dir` is the same as  
-`js-hell dir some_dir/**`)
+`js-hell '"dir some_dir/**"'`)
   
 BUT, if a scriptlet specifies a type of file (for example, it specifes
 JSON files) then the glob will have the relevant extension(s) (so
@@ -427,12 +406,12 @@ The `--no-recurse` option prevents this behaviour; and a non-recursive
 glob is used. (So `js-hell json_thingy --no-recurse dir` is `js-hell
 json_thingy dir/*.json`)
   
-#### --recurse
-The option `--recurse` or `-R` inserts `**` before the final element of
-all globs. (For example `js-hell make_ico -R dir\*.png` is the same as
-`js-hell make_ico dir\**\*.png`)
+#### 
+The option `` or `-R` inserts `**` before the final element of
+all globs. (For example `js-hell '"make_ico -R dir\*.png"'` is the same as
+`js-hell '"make_ico dir\**\*.png'"`)
   
-<aside class=issue>`--recurse` is a legacy feature that predates `**`.
+<aside class="issue"> `` is a legacy feature that predates `**`.
 Is it still useful? Should it be pulled?</aside>                  
 
 #### Exclusion      
@@ -458,11 +437,11 @@ glob? How often do people really use these complicated globs?</aside>
 The `>` output redirection is available as normal. It's syntactic sugar
 for `--output=FILE` e.g.
 ```bash
-js-hell 'echo boo >goose'
+js-hell '"echo boo >goose"'
 ```
 is the same as 
 ```bash
-js-hell 'echo boo --output=goose'
+js-hell '"echo boo --output=goose"'
 ```
 There is (currently) no rewriting of `process.stdout`
 {[REDIR-OUT-ARGTOK],[REDIR-OUT-ARGTOK]}
@@ -472,11 +451,11 @@ Stderr redirection is available via the `2>` operator.
 {[REDIR-LOG-ARGTOK],[REDIR-LOG-ARGTOK]} It's syntactic sugar for
 `--log=FILE` e.g.
 ```bash
-js-hell 'log-echo message 2>status.log'
+js-hell '"log-echo message 2>status.log"'
 ```
 is the same as 
 ```bash
-js-hell 'log-echo message --log=status.log'
+js-hell '"log-echo message --log=status.log"'
 ```
 given a _hypothentical_ `log-echo` command. Agian, there is (currently)
 no rewriting of `process.stderr`; it just captures the `console.xxx`
@@ -486,24 +465,24 @@ messages.
 The '<' input redirection is available. And syntactic sugar for
 `--input=FILE` e.g.
 ```bash
-js-hell 'select "* from table" <database.sq3'
+js-hell '"select "* from table" <database.sq3"'
 ```
 is the same as 
 ```bash
-js-hell 'select "* from table" --input=database.sq3'
+js-hell '"select "* from table" --input=database.sq3"'
 ```
 
 #### '-' (The File Topic)
 As is traditional, `-` can be used as a file name meaning stdin; e.g.
 ```bash
-js-hell 'echo fish | cat -'
+js-hell '"echo fish | cat -"'
 ```
 which asks `cat` to output stdin, and so will print `fish`.
 {[PIPE-FILETOPIC-POSITIONAL]}
 
 `-` can also be used as arguments to an option:
 ```bash
-js-hell 'echo `{"option":"value"}` | cmd --config=-' 
+js-hell '"echo `{"option":"value"}` | cmd --config=-"'
 ```
 which means cmd's config file will be the passed json - assuming cmd's
 IDL includes `--config=JSON_FILE` or something similar.
@@ -549,20 +528,20 @@ There is hastily bolted on support for shell variables via `${}`; for
 example, in the below, the second argument to cmd are the conents of the
 variable "thing".
 ```sh
-js-hell 'cmd ${thing}'
+js-hell '"cmd ${thing}"'
 ```                  
 
-***Remember*** when calling from a conventional shell, you need to
+***Remember*** when calling from a conventional posix shell, you need to
 protect against the shell inserting its own variable.
 
 Variables must be complete arguments; e.g. this will NOT work:
 ```sh
-js-hell 'fetch https://${host}/${file}'
+js-hell '"fetch https://${host}/${file}"'
 ```                  
-In the above, the variables won't even be spotted. Use backticks. NB,
+The variables won't even be spotted (use backticks). NB,
 however, this does work:
 ```sh
-js-hell 'cmd --arg=${value}'
+js-hell '"cmd --arg=${value}"'
 ```                  
 because what comes after the '=' is special. 
 
@@ -570,28 +549,25 @@ What goes in the brackets is an expression in the same
 javascript-derived language that is used for the IDL's binding. So you
 can do thinfs like: 
 ```sh
-js-hell 'cmd --arg=${prompt()}'
+js-hell '"cmd --arg=${prompt()}"'
 ```
 
 #### Soft coercion
 If the value returned is a string, it will be converted into the type as
 if you'd typed it on the command line; for example access:
 ```sh
-js-hell 'xwh ${env.PORT}'   
+js-hell '"xwh ${env.PORT}"'
 ```
 this works fine, even though env.PORT is a string. Ditto:
 ```sh
-js-hell 'xwh ${prompt("Enter_port:")}'  
+js-hell '"xwh ${prompt(`Enter_port:`)}"'
 ```
 
 #### Caveats
 The following limitations:
-
  - Variables can't appear in lists. For example, annoyingly, this
-   doesn't work: `js-hell 'echo ${var}'` (But get is available for
-   simple variables - e.g. `js-hell 'get EOL --output-format=JSON'`.)
-
-  
+   doesn't (yet) work: `js-hell 'echo ${var}'` 
+ 
    
 ### List of global switches
 
@@ -622,16 +598,16 @@ The process to resolve a SCRIPTLET_NAME into the (module,
 annotation)-pair works as follows:
     
 1. If a `SCRIPTLET_NAME` begins `http:`, `https:` or `file:` then it's
-   assumed to be a [module url](#Modules). ((No tests))   
+   assumed to be a [module url](#modules). ((No tests))
 
 2. If a `SCRIPTLET_NAME` begins `/`, `\`, `./`, `.\` or `[A-Z]:` then
-   its assumed to be a [file url](#Files). ((No tests))
+   its assumed to be a [file url](#files). ((No tests))
   
 3. If neither of these conditions are met, then a [package tree is
-   created](#this-package-tree) for the current directory. Roughly,
+   created](#the-package-tree) for the current directory. Roughly,
    js-hell steps up the directory tree to find a `package.json` and adds
    likely candidates along with some builtins. `js-hell help` will list
-   the scriplets in the package tree.  
+   the scriplets in the package tree.
              
 4. If the `SCRIPTLET_NAME` matches a package name in the package tree,                  
    then that will be used.
@@ -641,7 +617,7 @@ annotation)-pair works as follows:
    (`.`), a forward slash (`/`) or backslash (`\`) - then it's assumed
    to be a file.
 
-6. Anything else is an error.  
+6. Anything else is an error.
 
 
 ##### builtin: resolve
@@ -704,18 +680,18 @@ Given a package.json, js-hell will build a package tree as follows:
   
 2. Then it looks at the `"js-hell"` key of the package.json.
   
-      a. If the `"js-hell"` key is a string (or an array of strings),
+      1. If the `"js-hell"` key is a string (or an array of strings),
       then a scritplet is added with the same name as the
       package. (The value of the js-hell key is the IDL for the
       main entry point---arrays are joined with line-breaks---and the
       IDL declared name must match the package name.)
     
-      b. If it's a non-null object, then it's treated as [package
-      list.](PackageList)
+      2. If it's a non-null object, then it's treated as [scriptlet
+      list.](#scriptlet-list)
 
-      c. Otherwise, no root package will be available.
+      3. Otherwise, no root package will be available.
 
-3. If the package.json doesn't provide a js-hell package list (2b), then
+3. If the package.json doesn't provide a js-hell scriptlet list (2ii), then
    the `"dependencies"` and `"devDependencies"` will be evaluated, and
    any explicit js-hell packages provide by them will be added to the
    tree. (I.e. to block this auto adding, you must supply an object to
@@ -726,7 +702,7 @@ Given a package.json, js-hell will build a package tree as follows:
    be added. (FIXME: all package scripts of the top level package should
    be available.)
 
-#### Package List
+#### Scriptlet List
 ```json 
 { 
   "name": "my-package",
@@ -734,7 +710,7 @@ Given a package.json, js-hell will build a package tree as follows:
   "js-hell": {
       "-- Keys beginning '--' are ignored":
          [ "(Yes, Crockford, when formal comments aren't available",
-           "everybody invents their own incompatible syntax;
+           "everybody invents their own incompatible syntax;"
            "better to have one agreed upon standard.)" ],
 
       "-- The package below will be called `my-package` and uses main.mjs": "",
@@ -764,14 +740,14 @@ Given a package.json, js-hell will build a package tree as follows:
      "package1": "1.0",
      "package2": "1.1" 
   },
-  "devDependnecies: {
+  "devDependencies": {
     "package3": "2.0"
   } 
 } 
 ```
-In the above, the package list is value of the `"js-hell"`
+In the above, the scriptlet list is value of the `"js-hell"`
 entry - i.e.:
-```
+```json
 {
     "my-package": [ "IDL=1", "-- My package!!", "my-package :: default()" ],
     "package2":   "IDL=1 package2 :: default()",
@@ -802,10 +778,9 @@ module or package. (`"package3"` and `"./script.mjs"` in the above.)
 
 
 ##### Scriptlet Names (External Names)
-The name given to a scriptlet is generally taken from the key in the
-package list.
+The name of a scriptlet is deduced from the key in the scriptlet list.
 
-When the key is an URL, and there's no "#" fragment, then the path's
+When the key is an URL, and there's no "#"-fragment, then the path's
 basename is used, stripped of any extension. (For example,
 `./script.mjs` will create a scriptlet called `script`.)
 
@@ -818,24 +793,23 @@ will create a scriptlet called `first-entry`, and
 When a scritplet's name is a dependency name (i.e. another package),
 then the scriptlet name will be the dependency's name. 
 
-
-<!-- Move this documentration elsewhere--> NB if the IDL for a
-dependency is '*' and dependency provides multiple scriptlets, then they
-will be created as sub-commands of the scriptlet:
-
-For example, if `"package3"` has this as it's package.json:
-```json
-{   
-    "name":"package3",
-    "main": "./main.mjs",
-    "js-hell": {
-        "./main.mjs#wibble": "IDL=1 wibble :: wibble()", 
-        "./main.mjs#wobble": "IDL=1 wobble :: wobble()"
-    } 
-} 
-```
-Then the command `wibble` and `wobble` will be accessible as `package3
-wibble` and `package3 wobble` {[PKT-MULTI]} 
+> [!NOTE] When the IDL for a
+> dependency is '*' _and the dependency provides multiple scriptlets,_ then they
+> will be created as _sub-commands_ of the scriptlet:
+>
+> For example, if `"package3"` has this as it's package.json:
+> ```json
+> {   
+>    "name":"package3",
+>    "main": "./main.mjs",
+>    "js-hell": {
+>        "./main.mjs#wibble": "IDL=1 wibble :: wibble()", 
+>        "./main.mjs#wobble": "IDL=1 wobble :: wobble()"
+>    } 
+> } 
+> ```
+> Then the command `wibble` and `wobble` will be accessible as `package3
+> wibble` and `package3 wobble` {[PKT-MULTI]} 
 
 
 ##### IDL Names (Internal Names)
@@ -1017,11 +991,14 @@ _declaration_) and some historic magic.
    `|>`](https://github.com/tc39/proposal-pipeline-operator) is
    available. Also, topics can be numbered, with '%1' being the output
    of the original function: 
-``` 
-IDL=1 
-cmd ARCHIVE_FILE FILE... 
-:: with (Archive) new Archive() |> $2.forEach( file => %.add( file ) ) |> %1.toUint8Array() -> $archiveFile'
-```    
+   ``` 
+   IDL=1 
+   cmd ARCHIVE_FILE FILE... 
+   :: with (Archive)
+        new Archive()
+        |> $2.forEach( file => %.add( file ) )
+        |> %1.toUint8Array() -> $archiveFile'
+   ```    
  - It's an async context with `await` available.
  - The unary '*' operator is equivalent to `[Symbol.iterator]` and
    iterators have a map on their prototype. (So `*files.map( f =>
@@ -1035,8 +1012,8 @@ Options that don't take a value are called booleans options.
 export const js_hell=`IDL=1 boolie [--flag] :: default(flag);
 export default function(flag) { return flag ? "enabled" : "disabled" }
 ```
-<!--Boolean options are always optional; i.e. they must appear in square
-brackets. (For example, `IDL=1 cmd --flag` throws an error.)-->
+<!-- Boolean options are always optional; i.e. they must appear in square
+brackets. (For example, `IDL=1 cmd --flag` throws an error.) -->
 
 A boolean's lexical variable defaults to false (e.g. `flag` in the above
 is false and `js-hell boolie` returns `"disabled"`) {[BOOL-UNSET]} and
@@ -1076,7 +1053,7 @@ cmd [--flag] [--flag]` throws.) {[NODUP-BOOL]}
 
 #### Recurring
 "Boolean" options may be repeated: 
-```
+```js
 export const js_hell = `IDL=1 loggable [(--verbose|-v)]... :: default({verbose})`; 
 ```
 Their lexical value becomes the number of time they're repeated on the
@@ -1428,7 +1405,7 @@ Which is a poetic way of saying it's a API hack which is only available
 from inside a js-hell binding. 
 
 For example,
-```
+```json
 {
   "name": "repeat"
   "js-hell": 
@@ -1459,13 +1436,13 @@ code.
 The `@option` "decorator" can be used in the bindings to create options
 without declaring them in the usage. For example:
 
-```
+```js
 export const js_hell = `IDL=1 
 cmd :: 
 default( @option(File) file, @option count = 4, { @option flag = false })` 
 ```
 is equivalent to:
-```
+```js
 export const js_hell = `IDL=1 
 cmd [--count=INT] [--flag] --file=FILE  
 :: default( file, count = 4, { flag })` 
@@ -1479,11 +1456,11 @@ cmd
 ```
 is fine.
 
-The argument to the @option decorator is the options type. If you
+The argument to the `@option` decorator is the options type. If you
 default an option, the types must agree. {[@OPTION-TYPEMATCH]} For
 example, this is illegal:
 
-```
+```js
 export const js_hell = `IDL=1 cmd :: default(@option(String) foo = 4)`;
 ```
 
