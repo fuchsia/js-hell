@@ -4,10 +4,10 @@ Js-Hell is a tool for running javascript from the command-line (CLI).
 
 Instead of using a library to write a bespoke CLI script, you annotate
 your script or package and js-hell runs it for you. (In essence, your
-script becomes a js-hell plugin.)
+script becomes a plugin for js-hell.)
   
-To learn how to write these annotations, skip straight to the [IDL]()
-section.
+To learn how to write these annotations, skip straight to the
+[IDL](#IDL) section.
 
 Examples 
 ----
@@ -406,10 +406,10 @@ The `--no-recurse` option prevents this behaviour; and a non-recursive
 glob is used. (So `js-hell json_thingy --no-recurse dir` is `js-hell
 json_thingy dir/*.json`)
   
-#### 
-The option `` or `-R` inserts `**` before the final element of
-all globs. (For example `js-hell '"make_ico -R dir\*.png"'` is the same as
-`js-hell '"make_ico dir\**\*.png'"`)
+#### --recurse
+The option `--recurse` or `-R` inserts `**` before the final element of
+all globs. (For example `js-hell '"make_ico -R dir\*.png"'` is the same
+as `js-hell '"make_ico dir\**\*.png'"`)
   
 <aside class="issue"> `` is a legacy feature that predates `**`.
 Is it still useful? Should it be pulled?</aside>                  
@@ -793,23 +793,23 @@ will create a scriptlet called `first-entry`, and
 When a scritplet's name is a dependency name (i.e. another package),
 then the scriptlet name will be the dependency's name. 
 
-> [!NOTE] When the IDL for a
-> dependency is '*' _and the dependency provides multiple scriptlets,_ then they
-> will be created as _sub-commands_ of the scriptlet:
->
-> For example, if `"package3"` has this as it's package.json:
-> ```json
-> {   
->    "name":"package3",
->    "main": "./main.mjs",
->    "js-hell": {
->        "./main.mjs#wibble": "IDL=1 wibble :: wibble()", 
->        "./main.mjs#wobble": "IDL=1 wobble :: wobble()"
->    } 
-> } 
-> ```
-> Then the command `wibble` and `wobble` will be accessible as `package3
-> wibble` and `package3 wobble` {[PKT-MULTI]} 
+When the IDL for a dependency is '*' _and the dependency provides
+multiple scriptlets,_ then they will be created as _sub-commands_ of the
+scriptlet:
+
+For example, if `"package3"` has this as it's package.json:
+```json
+{   
+   "name":"package3",
+   "main": "./main.mjs",
+   "js-hell": {
+       "./main.mjs#wibble": "IDL=1 wibble :: wibble()", 
+       "./main.mjs#wobble": "IDL=1 wobble :: wobble()"
+   } 
+} 
+```
+Then the command `wibble` and `wobble` will be accessible as `package3
+wibble` and `package3 wobble` <sup>(PKT-MULTI)</sup> 
 
 
 ##### IDL Names (Internal Names)
@@ -890,9 +890,9 @@ An IDL string looks like this:
 ```
 IDL=<version> <usage> :: <binding>
 ```
- - <version> has to be `1`. 
+ - `<version>` has to be `1`. 
  - `<usage>` describes the command line options and parameters and
-   defaults. 
+   defaults.  
  - And the `<binding>` describes how to invoke the javascript. 
 
   
@@ -953,12 +953,12 @@ _declaration_) and some historic magic.
    form. In both cases, the exports of the module are in scope. (With
    any default export available as `default`.)
 
-    a. For the function-form, the binding **must begin with a call to
+    1. For the function-form, the binding **must begin with a call to
        a function.** (Historic quirk: it's possible to omit the
        name and `default` was assumed. Don't do that.) But there can't
        be anything after the function call. And it must be the only
        export that is used.
-    b. The expression-form begins `with()`, and the `with` must include
+    2. The expression-form begins `with()`, and the `with` must include
        all the identifiers from the module that will be used. A normal
        expression can then follow (e.g. `with(default,TYPE_ONE) default(
        $1 = TYPE_ONE )` or `with(Archive) new Archive($1).method($2)`)
@@ -1549,16 +1549,10 @@ future.) It's provided for compatibility with the web host, `xwh`.
  
 
 
-[<ArrayBuffer>]:
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
-
+[<ArrayBuffer>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 [<Buffer>]: https://nodejs.org/api/buffer.html#buffer
-
-[<Uint8Array>]:
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-
-[<string>]:
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type
+[<Uint8Array>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
+[<string>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type
 
 
  
