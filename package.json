@@ -1,6 +1,6 @@
 {
   "name": "js-hell",
-  "version": "1.0.20250113",
+  "version": "1.0.20250114",
   "description": "A tool for running javascript from the command-line (CLI). Instead of creating a CLI tool, annotate your library and js-hell will run it for you.",
   "keywords": [ "cli", "shell" ],
   "homepage": "https://github.com/fuchsia/js-hell#readme",

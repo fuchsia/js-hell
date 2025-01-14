@@ -1,6 +1,6 @@
 JS-HELL 
 =====
-Js-Hell is a tool for running javascript from the command-line (CLI). 
+Js-hell is a tool for running javascript from the command-line (CLI). 
 
 Instead of using a library to write a bespoke CLI script, you annotate
 your script or package and js-hell runs it for you. (In essence, your
@@ -15,7 +15,9 @@ Examples
 If you're hacking up a custom script, it's often easiest to annotate the
 file itself:
 ```js 
-export js_hell = "IDL=1 vectorise [--force] JSON_FILE NAME :: default( await $1.json(), $2, {force}) as JSON -> $1"; 
+export js_hell = `IDL=1 
+vectorise [--force] JSON_FILE NAME 
+:: default( await $1.json(), $2, {force}) as JSON -> $1`; 
 
 export default function main( json, id, {force} )
    /* modify json */
@@ -194,8 +196,8 @@ results in js-hell outputing `some` (without any quotes).
 
 The exact rule is that quotes are removed when one of the quote
 characters (`"`or `'`) opens an argument, and the same quote character
-closes it and occurs nowhere else in the argument. {[REDUP-*]
-first-pass}
+closes it and occurs nowhere else in the argument. <sup>(REDUP-*
+first-pass)</sup>
 
 This allows safe cross-platform quoting; e.g.
 ```json
@@ -244,7 +246,7 @@ quoted. So js-hell applies the following logic:
     (`'`) or double- (`"`) quote---one at the beginning and one at the
     end---have them stripped. Such arguments are considered quoted, and
     can never be "syntax" - i.e. cannot be options, operators, etc...
-    {[REDUP-*] first pass} 
+    <sup>(REDUP-* first pass)</sup> 
 
     NB. To access this feature from another shell means
     reduplicating quotes, e.g. `js-hell echo '"--output=file"'`
@@ -308,7 +310,7 @@ them in sync? Or move it here?--> <!-- Split this into topics -->
     and by the specials ``!?$%^=@#~()[]{}<>&|,;`'"``. (So `some>file` is
     two argments separator by the `>` operator.)  
  2. Spaces and specials must be quoted for their literal value to appear
-    in an argument. {[ARGTOK-SPECIAL-*]} Due to code reuse, the
+    in an argument. <sup>(ARGTOK-SPECIAL-*)</sup> Due to code reuse, the
     double-colon `::` cannot appear unquoted. (A bug to be fixed...)
  3. Simple Quoting:
      <!-- Annoying we can't nest with letters; it displays as roman numerals. -->
@@ -323,7 +325,7 @@ them in sync? Or move it here?--> <!-- Split this into topics -->
     4. There are **no escapes** with backslashes or anything else.
        (This is for compatibility with Windows where, for example,
        `"\\server\share\some dir\"` makes it about impossible to escape
-       anything with a backslash.) {[ARGTOK-BACKSLASH-*]}
+       anything with a backslash.) <sup>(ARGTOK-BACKSLASH-*)</sup>
     5. Quotes must be proceed by or followed by a space or an operator;
        it is an error for them to happen mid argument. (So `cmd x" "y`
        is an error.)
@@ -349,7 +351,8 @@ them in sync? Or move it here?--> <!-- Split this into topics -->
 
     - They should always return strings.
 
-    - `$(` is reserved {[TEMPLATE-NO-$(]} and must be escaped. At some
+    - `$(` is reserved <sup>[TEMPLATE-NO-$(]</sup> and must be escaped.
+      At some
       point it will support CLI subshells, e.g. 
      ``js-hell echo1 `some$(cmd)thing`" ``
 
@@ -444,12 +447,12 @@ is the same as
 js-hell '"echo boo --output=goose"'
 ```
 There is (currently) no rewriting of `process.stdout`
-{[REDIR-OUT-ARGTOK],[REDIR-OUT-ARGTOK]}
+<sup>(REDIR-OUT-ARGTOK,REDIR-OUT-ARGTOK)</sup>
 
 #### 2>FILE 
 Stderr redirection is available via the `2>` operator.
-{[REDIR-LOG-ARGTOK],[REDIR-LOG-ARGTOK]} It's syntactic sugar for
-`--log=FILE` e.g.
+<sup>([REDIR-LOG-ARGTOK],[REDIR-LOG-ARGTOK])</sup> It's syntactic sugar
+for `--log=FILE` e.g.
 ```bash
 js-hell '"log-echo message 2>status.log"'
 ```
@@ -478,7 +481,7 @@ As is traditional, `-` can be used as a file name meaning stdin; e.g.
 js-hell '"echo fish | cat -"'
 ```
 which asks `cat` to output stdin, and so will print `fish`.
-{[PIPE-FILETOPIC-POSITIONAL]}
+<sup>(PIPE-FILETOPIC-POSITIONAL)</sup>
 
 `-` can also be used as arguments to an option:
 ```bash
@@ -486,15 +489,15 @@ js-hell '"echo `{"option":"value"}` | cmd --config=-"'
 ```
 which means cmd's config file will be the passed json - assuming cmd's
 IDL includes `--config=JSON_FILE` or something similar.
-{[PIPE-FILETOPIC-OPTION]}
+<sup>(PIPE-FILETOPIC-OPTION)</sup>
 
 A `-` that occur after "--" is treated as an ordinary dash. For example
 ```bash
 js-hell 'cat -- -'
 ``` 
-the above tries to output a file called "-". {[STRTOK-FILETOPIC],
-[ARRAYTOK-FILETOPIC]} But it's probably easier just to supply a path -
-e.g:
+the above tries to output a file called "-". <sup>(STRTOK-FILETOPIC
+ARRAYTOK-FILETOPIC)</sup> But it's probably easier just to supply a path
+- e.g:
 ```bash
 js-hell 'cat ./-'
 ```
@@ -504,7 +507,7 @@ A dash will be treated as plain text when not used to an argument that's
 ```bash
 js-hell 'echo -'
 ```
-which outputs an ordinary "-". {[FILETOPIC-TEXT-*]} 
+which outputs an ordinary "-". <sup>(FILETOPIC-TEXT-*)</sup> 
 
 "-" cannot be used twice - as it's a stream; for example this is an
 error:
@@ -515,7 +518,7 @@ js-hell 'echo "boo!" | cmd - -'
 
 <!-- This doesn't belong here -->
 
-And you can't use `--output` while piping: {[PIPE-TEELESS]}
+And you can't use `--output` while piping: <sup>(PIPE-TEELESS)</sup>
 ```bash
 js-hell 'echo "boo!" --output=file.txt | cmd'  
 ```
@@ -817,9 +820,9 @@ The IDL also gives a name for the scriptlet. This must match the
 "external" scriptlet name. 
 
 For example, if a script is called `"./script.mjs"` then the IDL _can't_
-be `"IDL=1 cmd :: default()"` {[NAM-ESM]} it has to be something like
-`"IDL=1 script :: default()"`. Likewise this package is misnamed:
-{[NAM-PKG]}
+be `"IDL=1 cmd :: default()"` <sup>(NAM-ESM)</sup> it has to be
+something like `"IDL=1 script :: default()"`. Likewise this package is
+misnamed: <sup>(NAM-PKG)</sup>
 
 ```json
 {
@@ -833,8 +836,8 @@ Again, the `"js-hell"` key has to be something like `"IDL=1 cmd ::
 default()"`. 
 
 However the IDL can use `"$0"` as the scriptlet name, and that will
-always take on the external name; {[NAM-$0]} for example, the scriplet
-in this package is called `cmd-thing`.
+always take on the external name; <sup>(NAM-$0)</sup> for example, the
+scriplet in this package is called `cmd-thing`.
 ```json
 {
     "name": "cmd-thing",
@@ -851,7 +854,7 @@ js-hell exits with the following codes:
 |---|------
 | 0 | The command line was successful.
 | 1 | The command line was successfuly, but return false.
-| 4 | The scriptlet itself threw an exception - i.e. user code. {[EXIT-USER-EX]}
+| 4 | The scriptlet itself threw an exception - i.e. user code. <sup>(EXIT-USER-EX)</sup>
 | 5 | Some other error.
 
 ### builtins
@@ -877,11 +880,11 @@ And a template file, `template.txt`:
 I said to the ghost, "${ghost}" 
 ```
 Then the output of `js-hell '"template vars.json template.txt"'` will be
-`I said to the ghost, "Boo!"` {[BUILTIN-TEMPLATE-FILE]} 
+`I said to the ghost, "Boo!"` <sup>(BUILTIN-TEMPLATE-FILE)</sup> 
  
 If the json has come from another scriptlet, then it can be piped to
 template with the file topic; e.g. `json-outputting-cmd | template -
-template.shtml` {[BUILTIN-TEMPLATE-FILETOPIC]}
+template.shtml` <sup>(BUILTIN-TEMPLATE-FILETOPIC)</sup>
   
 
 IDL 
@@ -905,7 +908,7 @@ cmd [--show-line-numbers] [--max=COUNT] [--pattern=(regex|glob)] TEXT [SOURCE_FI
 It's roughly as you'd expect:
  - The scriptlet name must match the ["external"
    name.](#scriptlet-names-external-names) or be the special "$0".
-   Because of this it's allowed to be mixed case. {[NAM-MIX]}
+   Because of this it's allowed to be mixed case. <sup>(NAM-MIX)</sup>
  - Long options must be lower case - separated by hyphens ("kebab
    case"). They must come before any positionals. Options without values
    ([booleans](#boolean-options)) can have an "--no-<option>" to turn it
@@ -916,10 +919,11 @@ It's roughly as you'd expect:
  - Square brackets indicate optional values. Positionals can be nested,
    as long, as its unambiguous. 
  - An elipsis indicates a positional is repeated (e.g. `FILE...`).
-   {[RE-POS,RE-OUT,RE-IN]} Options can also be repeated, but it must be
-   optional and the elipsis must be outside the square brackets (e.g.
-   `[--option=TEXT]...`) {[MULT-OUT,MULT-IN]} Repeatd booleans (e.g.
-   `[--verbose]...`) become a count of the number of times applied.    
+   <sup>(RE-POS RE-OUT RE-IN)</sup> Options can also be repeated, but it
+   must be optional and the elipsis must be outside the square brackets
+   (e.g. `[--option=TEXT]...`) <sup>(MULT-OUT MULT-IN)</sup> Repeatd
+   booleans (e.g. `[--verbose]...`) become a count of the number of
+   times applied.    
  - Lower case text (that's not an option) is literal text. Brackets and
    vertical bars can be used to create alternatives (i.e. in the above
    example the `--pattern` option, if present, must take the value
@@ -972,7 +976,7 @@ _declaration_) and some historic magic.
  - If a type name only occurs once as a positional, then it is available
    as camel cased name with a leading `$`. (So, in this case, `$1` and
    `$text` are the same variable, as are `$sourceFile` and `$2` and
-   `$resultFile` and `$3`. {[BIND-IPOS,BIND-SUB]}
+   `$resultFile` and `$3`. <sup>(BIND-IPOS BIND-SUB)</sup>
  - stdin/stdout is combined in a magical FILE-like object called `$-`.
  - The `=` operator is not used for assigment but for "defaulting" (as
    per function declaration); i.e. it assigns only if the value doesn't
@@ -1016,9 +1020,9 @@ export default function(flag) { return flag ? "enabled" : "disabled" }
 brackets. (For example, `IDL=1 cmd --flag` throws an error.) -->
 
 A boolean's lexical variable defaults to false (e.g. `flag` in the above
-is false and `js-hell boolie` returns `"disabled"`) {[BOOL-UNSET]} and
+is false and `js-hell boolie` returns `"disabled"`) <sup>(BOOL-UNSET)</sup> and
 becomes true, when the option is present in the command-line invocation
-(e.g., `js-hell boolie --flag` returns `"enabled"`.) {[BOOL-SET]}
+(e.g., `js-hell boolie --flag` returns `"enabled"`.) <sup>(BOOL-SET)</sup>
 
 However booleans options that begin `--no-` have the "no"-prefix removed
 from their lexical name _and_ the usual semantics are reveresed. So for
@@ -1027,8 +1031,8 @@ example:
 export const js_hell=`IDL=1 nolly [--no-can-do] :: default(canDo);
 export default function(canDo) { return canDo ? "done" : "You're kidding me, right?!" }
 ```   
-in the above, `js-hell nolly` retuns `"done"` {[NO-UNSET]} and `js-hell
---no-can-do` returns `"You're kidding me, right?!"` {[NO-SET]}. 
+in the above, `js-hell nolly` retuns `"done"` <sup>(NO-UNSET)</sup> and `js-hell
+--no-can-do` returns `"You're kidding me, right?!"` <sup>(NO-SET)</sup>. 
 
 #### Tristate
 It's possible to declare both a boolean option and it's negation in the
@@ -1039,17 +1043,17 @@ export const js_hell=`IDL=1 tristate [--no-state] [--state]
 :: default((state?1:-1) ?? 0)`;
 ```
 In these cases, either the option (e.g., `js-hell tristate --state`
-{[TRISTATE-TRUE]}) or it's negation (e.g. `js-hell tristate --no-state`
-{[TRISTATE-FALSE]}) can be supplied on the CLI. (But not both. {})
+<sup>(TRISTATE-TRUE)</sup>) or it's negation (e.g. `js-hell tristate --no-state`
+<sup>(TRISTATE-FALSE)</sup>) can be supplied on the CLI. (But not both. {})
 
 If the option is not supplied, then it will be "missing" and a default
-must be set. {[TRISTATE-ABSENT]} (Unfortunately, the lack of a default
+must be set. <sup>(TRISTATE-ABSENT)</sup> (Unfortunately, the lack of a default
 in the binding can only be picked up at run time.) (FYI Missing values
 parse through the ternary operator and are caught by `??` - which is why
 `(state?1:-1)??0` works.)
 
 Booleans options can only occur once in the usage. (For example, `IDL=1
-cmd [--flag] [--flag]` throws.) {[NODUP-BOOL]}
+cmd [--flag] [--flag]` throws.) <sup>(NODUP-BOOL)</sup>
 
 #### Recurring
 "Boolean" options may be repeated: 
@@ -1060,7 +1064,7 @@ Their lexical value becomes the number of time they're repeated on the
 command-line - defaulting to zero if absent. (For example, `loggable` is
 called with `{verbose:0}`, `loggable --verbose -v` is called with
 `{verbose:2}` and `loggable -vvv` is called with `{verbose:3}`.)
-{[MULTIBOOL-*]}
+<sup>(MULTIBOOL-*)</sup>
 
 ### STRING, STR and TEXT positionals and options.
 Positional parameters can be declared as `STRING`, `STR`, or `TEXT`:
@@ -1068,7 +1072,7 @@ Positional parameters can be declared as `STRING`, `STR`, or `TEXT`:
 export const js_hell=`IDL=1 cmd STR STRING TEXT :: default($1,$2,$3);
 export default function(...strings) { return strings }
 ```
-Each is passed to the javascript as [<string>][] value.
+Each is passed to the javascript as [\<string>][] value.
 
 Likewise, options can be given `STRING`, `STR`, or `TEXT` values:
 ```js
@@ -1089,9 +1093,9 @@ Inside js-hell all strings have the following extra methods ("flying
 monkeys"):
 
 ##### `hash([seed])`
- - `seed` [<number>][] The seed to use. Defaults to a
+ - `seed` [\<number>][] The seed to use. Defaults to a
    (non-cryptographic) random  number. 
- - Returns: [<number>][] 
+ - Returns: [\<number>][] 
 
 Calculate a fast, non-cryptographic hash of the string. (It's currently
 the murmur3 32bit hash of the string's utf8 encoding.)
@@ -1111,12 +1115,12 @@ Positional and named options can declared can be declared as `FILE`,
 `FILE_NAME` and `FILENAME`. 
 
 `FILE` values are passed to the javascript as
-[`Buffer`](https://nodejs.org/api/buffer.html) objects (where available)
+[\<Buffer>][] objects (where available)
 or
-[`Uint8Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) 
-(platforms without buffer) - see `File.toBuffer()` {[FILE-REAL]}  
+[\<Uint8Array>][] 
+(platforms without buffer) - see `File.toBuffer()` <sup>(FILE-REAL)</sup>  
 FILE_NAME and FILENAME options are passed to the javascript as strings.
-{[FN-REAL]}
+<sup>(FN-REAL)</sup>
 
 However, inside js-hell (i.e. in the binding) they all have the same
 API, roughly modelled on the File API
@@ -1128,44 +1132,44 @@ out below:
 ##### `name` 
 A string containing the basename of the file. (For example, a scriptlet
 declares as `IDL=1 cmd FILE :: with() $1.name` called as `cmd
-some/path/to/file.txt` will return `file.txt`) {[FILE-NAME]}
+some/path/to/file.txt` will return `file.txt`) <sup>(FILE-NAME)</sup>
 
 ##### `webkitRelativePath`
 A string containing the name the user supplied on the command line. (For
 example, a scriptlet declared as `IDL=1 cmd --option=FILENAME :: with()
 option.webkitRelativePath` and called as `cmd some/path/to/file.txt`
-will return `some/path/to/file.txt`) {[FILE-RELPATH]}
+will return `some/path/to/file.txt`) <sup>(FILE-RELPATH)</sup>
 
 ##### `fullPath`
 A string containing the absolute path (For example, a scriptlet declared
 as `IDL=1 cmd FILE_NAME :: with() $1.fullpath` and called as `cmd
 some/file.txt` might return return `c:\\dir\\some\\file.txt`)
-{[FILE-FULLPATH]} (This property comes from
+<sup>(FILE-FULLPATH)</sup> (This property comes from
 [FileSystemEntry](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemEntry).)
 
 ##### `isFile`
 A boolean that is true if the file exists and is an ordinary file.
-{[FILE-IS]} (This property comes from
+<sup>(FILE-IS)</sup> (This property comes from
 [FileSystemEntry](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemEntry/isFile).) 
 
 ##### `isDirectory`
-A boolean that is always false {[FILE-NOTDIR]} (This property comes from
+A boolean that is always false <sup>(FILE-NOTDIR)</sup> (This property comes from
 [FileSystemEntry](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemEntry/isDirectory).)
 
 ##### `size`
-The size in bytes of the file, if it exists. {[FILE-SIZE]} Or `NaN` if
-it doesn't. {[FILE-SIZE-MISSING}]
+The size in bytes of the file, if it exists. <sup>(FILE-SIZE)</sup> Or `NaN` if
+it doesn't. <sup>(FILE-SIZE-MISSING}]
 
 ##### `lastModified`
 The number of milliseconds (probably excluding leap seconds) since 1st
-January 1970, if the file exists. {[FILE-DATE]} Or `NaN` if it doesn't.
-{[FILE-DATE-MISSING}]
+January 1970, if the file exists. <sup>(FILE-DATE)</sup> Or `NaN` if it doesn't.
+<sup>(FILE-DATE-MISSING}]
 
 ##### `type`
-A string containg the mimetype of the file. {[FILE-TYPE]} This is
+A string containg the mimetype of the file. <sup>(FILE-TYPE)</sup> This is
 currently deduced from the filename alone, so will be defined even if
-the file exists. {[FILE-TYPE-MISSING]} And if the file name has no
-extension {[FILE-TYPE-NOEXT]} or the extension can refer to multiple
+the file exists. <sup>(FILE-TYPE-MISSING)</sup> And if the file name has no
+extension <sup>(FILE-TYPE-NOEXT)</sup> or the extension can refer to multiple
 file types (e.g. `.ico`), or the extension is not known, then the empty
 string is returned.
 
@@ -1177,8 +1181,8 @@ Most of this is consistent with what browsers do; see
 `to<Type>()` methods return synchronous results.)    
 
 ##### `toArrayBuffer()`
-Return the content of the file a [<ArrayBuffer>][]
-{[FILE-TO-ARRAYBUFFER]}
+Return the content of the file a [\<ArrayBuffer>][]
+<sup>(FILE-TO-ARRAYBUFFER)</sup>
 
 On node 22, this invariably involves creating a copy of the buffer.
 (Because the buffers return by `readFileSync()` are partial views of the
@@ -1187,14 +1191,14 @@ Using `toBuffer()` avoids that.
 
 ##### `arrayBuffer()`
 Asynchronous version of `toArrayBuffer()`; i.e. return the contents of
-`toArrayBuffer()` wrapped in a proimise. {[FILE-ARRAYBUFFER]}
+`toArrayBuffer()` wrapped in a proimise. <sup>(FILE-ARRAYBUFFER)</sup>
    
 ##### `toBuffer()`
-Return the content of the file as a [<Buffer>][] (node.js) or an
-[<Uint8Array>]() (other platforms.) (For example, a scriptlet declared
+Return the content of the file as a [\<Buffer>][] (node.js) or an
+[\<Uint8Array>][] (other platforms.) (For example, a scriptlet declared
 as `IDL=1 cmd FILE :: with() $1.toBuffer()` and called as `cmd
 some/file.txt` would return the contents of `some/file.txt` as a Buffer)
-{[FILE-TO-BUFFER]}
+<sup>(FILE-TO-BUFFER)</sup>
 
 If you try and pass a `File` instance from js-hell to a javascript
 function, then this method will be automaticall used. (For example,
@@ -1203,11 +1207,11 @@ with() $1.toBuffer()`) This is a process known as type realisation. This
 is partly historic (`File` wasn't in node when js-hell was created) and
 also because the object used by js-hell isn't a `File`. But
 9-times-out-of-10, it's what's wanted and a real `File` is a
-asynchronous hell hole. {[FILE-REAL]}  
+asynchronous hell hole. <sup>(FILE-REAL)</sup>  
  
 ##### `buffer()` 
 Return the contents of `file.toBuffer()` wrapped in a promise.
-{[FILE-BUFFER]} For symmetry.
+<sup>(FILE-BUFFER)</sup> For symmetry.
 
 ##### `database([TABLE_NAME])`
 This returns an sqlite3 database. The following files are supported: 
@@ -1226,34 +1230,34 @@ becomes stable.
 
 ##### `toJSON()`
 A convenience method that parses the contents of the file with
-`JSON.parse()`. {[FILE-TO-JSON]} 
+`JSON.parse()`. <sup>(FILE-TO-JSON)</sup> 
 
 ##### `json()`
 A promise containing the contents of the file parsed via `JSON.parse()`.
-{[FILE-JSON]}
+<sup>(FILE-JSON)</sup>
 
 ##### `toLines()`
 Return an _iterator_ that iterates over the lines in the file, returning
 the text content of each line. The line seperator can be `\n` or `\r\n`
-or EOF. It's **not** included the text returned. {[FILE-TO-LINES]}
+or EOF. It's **not** included the text returned. <sup>(FILE-TO-LINES)</sup>
 
 ##### `lines()`
 Return an _async iterator_ that iterates over the lines in the file.
-Apaert from async, it's the same as [`toLines()`]() {[FILE-TO-LINES]}   
+Apaert from async, it's the same as [`toLines()`]() <sup>(FILE-TO-LINES)</sup>   
    
 ##### `toText()`
 Return the content of the file as utf8 encoded string. (For example, a
 scriptlet declared as `IDL=1 cmd FILE :: with() $1.toText()` and called
 as `cmd some/file.txt` would return the contents of `some/file.txt`)
-{[FILE-TO-TEXT]}
+<sup>(FILE-TO-TEXT)</sup>
 
 ##### `text()`
 For compatibility with `File`, this method return the contents of
-`file.toText()` wrapped in a promise. {[FILE-TEXT]} 
+`file.toText()` wrapped in a promise. <sup>(FILE-TEXT)</sup> 
 
 ##### `toURL()`
-Return the full path to the file as a `file:` url {[FILE-URL}, even if
-the file doesn't exist. {[FILE-URL-MISSING]}
+Return the full path to the file as a `file:` url <sup>(FILE-URL}, _even if
+the file doesn't exist._ <sup>(FILE-URL-MISSING)</sup>
 
 ### (JSON|FILE)
 Positional and named options can declared can be declared as
@@ -1273,18 +1277,18 @@ contents of a file called `true` and not the literal value `true`.
 Passing literal JSON is virtually impossible thanks to the quoting
 minefield. But if you really must:
  - From a POSIX shell: ``js-hell 'template `{"key":"value string"}`
-   template-file.txt'`` is probably easiest. {[LITERAL-JSON-DQ]} 
+   template-file.txt'`` is probably easiest. <sup>(LITERAL-JSON-DQ)</sup> 
  - From windows cmd.exe, ``js-hell "template `{""key"":""value  
    string""}` template-file.txt"`` should work. (No test) 
  - And if you want it to be cross-platform, it's ``js-hell '"template
    `{\x22key\x22:\x22value string\x22}` template-file.txt"'``
-   {[LITERAL-JSON-HEX]} 
+   <sup>(LITERAL-JSON-HEX)</sup> 
  - You can cut down on quotes by using expressions;  e.g. ``js-hell
    '"template ${ ( {key:`value string`,count:2} ) }
    template-file.txt"'``. Note the need for an extra set of parenthesis
    inside `${}` and the use template literals rather than quoted
    strings. That's cross platform. (And the spaces inside `${}` are for
-   exposition and can be omitted.) {[LITERAL-JSON-EXPR]}
+   exposition and can be omitted.) <sup>(LITERAL-JSON-EXPR)</sup>
 
 #### From Javascript:
 The contents of a `(JSON|FILE)` argument are passed to javascript as the
@@ -1457,7 +1461,7 @@ cmd
 is fine.
 
 The argument to the `@option` decorator is the options type. If you
-default an option, the types must agree. {[@OPTION-TYPEMATCH]} For
+default an option, the types must agree. <sup>(@OPTION-TYPEMATCH)</sup> For
 example, this is illegal:
 
 ```js
@@ -1548,11 +1552,15 @@ This is always set to the NIL UUID
 future.) It's provided for compatibility with the web host, `xwh`. 
  
 
+[\<ArrayBuffer>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
 
-[<ArrayBuffer>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
-[<Buffer>]: https://nodejs.org/api/buffer.html#buffer
-[<Uint8Array>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-[<string>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type
+[\<Buffer>]: https://nodejs.org/api/buffer.html#buffer
+
+[\<Uint8Array>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
+
+[\<string>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type
+
+[\<number>]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type
 
 
  

@@ -1,5 +1,6 @@
 Road Map
 =========
+What gets added next depends on what I need next. But the 
   
 ## CLI   
   
@@ -18,14 +19,6 @@ Road Map
  * Output formatting needs a massive overhaul. It comes from a time when
    js-hell was far less fully features. Now we can do sensible casting.
   
- * I wanted to write:
-  
-```
-js-hell "srcwww\cook.mjs records2.json --output-format=csv | select --input=- '* from STDIN where event = in'"
-```
-  And couldn't get it to work. In fact, I ideally wanted:
-  ``js-hell "srcwww\cook.mjs records2.json | select '* from STDIN where event = in'"``  
-  (With cook outputing a table in json format.)
   
 ## Usage
  * Usage syntax tree, so that you can have sub cmds and other
@@ -45,3 +38,6 @@ blog [--title=TITLE] BODY_TEXT :: with(add) add($1,{title=''})
  * Comments! 
  * The ability to annotate options from the binding as well as the
    usage.     
+ * Virtualisation - into vms, shadow realms, or workers. Scriptlets are
+   supposed to be modules, so cooperative; but it would be nice to have
+   stronger isolation.   
